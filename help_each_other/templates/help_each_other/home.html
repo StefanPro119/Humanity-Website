@@ -1,0 +1,62 @@
+{% extends "help_each_other/layout.html" %}
+{% load static %}
+
+{% block content %}
+
+
+
+<div class="container" style="margin-bottom: 50px;">
+   <h1>{{ item }}</h1>
+    <div id="map"></div>
+</div>
+
+
+<div style="display: grid; grid-template-columns: 49% 49% 49%; padding-left: 5px; height:1000px;">
+    {% for list in lists %}
+        <div style="padding-left: 20px; width: 100%; padding-bottom: 80px">
+            <div class="card-title text-dark bg-info mb-3">
+
+                <h5 class="card-title">Address: {{ list.address }}</h5>
+            </div>
+            <div class="card">
+                {% if list.image %}
+                    <img src="{{ list.image.url }}" class="rounded" style="width: 25rem; height: 15rem">
+                {% else %}
+                    <img src="{% static 'help_each_other/pictures/images.png' %}" class="rounded" style="width: 25rem; height: 15rem">
+                {% endif %}
+
+
+                   <div style="padding-top: 20px; margin-left: 120px;">
+                     <a href="{% url 'show_current_item' list.id %}" type="button"  class="btn btn-info">Show on the map</a>
+                   </div>
+                <br>
+                <h6 class="card-title">Description: {{ list.description }}</h6>
+
+            </div>
+
+
+        </div>
+
+
+    {% endfor %}
+ </div>
+
+{% endblock %}
+{% block jscode %}
+$.ajax({
+        type: 'GET',
+        url:"{% url 'address_list' %}",
+        dataType: 'json',
+        success: function(address_list){
+        for(let address of address_list){
+            if(address != null){
+                geocoder = new google.maps.Geocoder();
+                codeAddress(geocoder, map, address);
+            }
+
+        }
+
+    }});
+{% endblock %}
+
+

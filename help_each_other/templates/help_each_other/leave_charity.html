@@ -1,0 +1,24 @@
+{% extends "help_each_other/layout.html" %}
+{% load static %}
+
+{% block content %}
+<h1>Leave your charity</h1>
+<form action="{% url 'leave_charity' %}" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form }}
+    <br>
+    <br>
+    <br>
+<input type="submit" value="Leave Charity">
+    <div id="map"></div>
+
+
+
+
+
+
+</form>
+
+
+
+{% endblock %}

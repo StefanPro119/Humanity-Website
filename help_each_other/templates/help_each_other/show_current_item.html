@@ -1,0 +1,29 @@
+{% extends "help_each_other/layout.html" %}
+{% load static %}
+
+{% block content %}
+
+
+<div class="container" style="margin-bottom: 50px;">
+    <div id="map"></div>
+</div>
+
+
+{% endblock %}
+{% block jscode %}
+
+$.ajax({
+        type: 'GET',
+        url: '{% url 'show_item' id %}',
+        dataType: 'json',
+        success: function(address) {
+            if(address != null){
+                var zoom = map.setZoom(16);
+                geocoder = new google.maps.Geocoder(zoom)
+                codeAddress(geocoder, map, address);
+
+        }
+
+    }});
+{% endblock %}
+

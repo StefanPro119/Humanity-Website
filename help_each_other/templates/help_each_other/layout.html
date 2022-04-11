@@ -1,0 +1,151 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{% static 'help_each_other/style.css' %}">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.min.js" integrity="sha384-skAcpIdS7UcVUC05LJ9Dxay8AXcDYfBJqt1CJ85S/CFujBsIzCIv+l9liuYLaMQ/" crossorigin="anonymous"></script>
+
+ <!-- -->
+
+    {% if title %}
+        <title>{{ title }}</title>
+    {% else %}
+        <title>help each other</title>
+    {% endif %}
+</head>
+<body>
+
+    <header class="site-header">
+      <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+        <div class="container">
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarToggle">
+            <div class="navbar-nav justify-content-end">
+              <a class="nav-item nav-link" href="{% url 'home' %}">Home</a>
+                {% if user.is_authenticated %}
+                    <a class="nav-item nav-link" href="{% url 'leave_charity' %}">Leave Charity</a>
+                {% endif %}
+            </div>
+            <!-- Navbar Right Side -->
+            <div class="navbar-nav justify-content-end">
+            {% if user.is_authenticated %}
+                <a class="nav-item nav-link" href="{% url 'profile' %}">Profile </a>
+                <a class="nav-item nav-link" href="{% url 'logout' %}">Logout </a>
+            {% else %}
+              <a class="nav-item nav-link" href="{% url 'login' %}">Login</a>
+              <a class="nav-item nav-link" href="{% url 'register' %}">Register</a>
+            {% endif %}
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <main role="main" class="container">
+        <div class="col-md-8">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+          {% block content %}{% endblock %}
+
+      </div>
+    </main>
+
+
+
+
+<script>
+
+var delayFactor = 0;
+function codeAddress(geocoder, map, address) {
+        geocoder.geocode({'address': address}, function(results, status) {
+          if (status === 'OK') {
+            map.setCenter(results[0].geometry.location);
+            var marker = new google.maps.Marker({
+              map: map,
+              position: results[0].geometry.location,
+
+      });
+          } else if (status === google.maps.GeocoderStatus.OVER_QUERY_LIMIT){
+
+                delayFactor++;
+                setTimeout(function () {
+                       codeAddress(geocoder, map, address)
+                }, delayFactor * 200);
+
+          } else {
+            alert('Geocode was not successful for the following reason: ' + status);
+          }
+        });
+      }
+
+        function initMap(){
+            var location = {
+                lat: 44.01667,
+                lng: 20.91667
+            }
+            var options = {
+                center: location,
+                zoom: 6.4
+            }
+            if(navigator.geolocation) {
+
+                navigator.geolocation.getCurrentPosition((loc) => {
+                    location.lat = loc.coords.latitude;
+                    location.lng = loc.coords.longitude;
+
+                    map = new google.maps.Map(document.getElementById('map'), options);
+                    },
+                    (err) => {
+                        map = new google.maps.Map(document.getElementById('map'), options);
+                    }
+                    )
+
+            }else {
+                map = new google.maps.Map(document.getElementById('map'), options);
+            }
+
+
+            autocomplete = new google.maps.places.Autocomplete(document.getElementById("id_address"), {
+                componentRestrictions: {'country': ['rs','xk']},
+                fields: ['geometry', 'adr_address'],
+            });
+
+            autocomplete.addListener("place_changed", () => {
+                const place = autocomplete.getPlace();
+                var marker = new google.maps.Marker({
+                    position: place.geometry.location,
+                    title: place.adr_address,
+                    map: map,
+                });
+
+
+            });
+
+            {% block jscode %}
+            {% endblock %}
+
+        }
+</script>
+
+    <script async
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyABYB8y5GeDmm2j1mHk9EqBebVUVAe53Mk&libraries=places&language=hr-HR&callback=initMap">
+    </script>
+</body>
+</html>
